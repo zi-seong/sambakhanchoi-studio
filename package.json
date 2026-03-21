@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite --host 127.0.0.1 --port 4173",
-    "preview": "vite preview --host 127.0.0.1 --port 4173"
+    "preview": "vite preview --host 127.0.0.1 --port 4173",
+    "prepare": "husky"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -67,8 +68,11 @@
     "vaul": "1.1.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "19.8.1",
+    "@commitlint/config-conventional": "19.8.1",
     "@tailwindcss/vite": "4.1.12",
     "@vitejs/plugin-react": "4.7.0",
+    "husky": "9.1.7",
     "tailwindcss": "4.1.12",
     "vite": "6.3.5"
   },

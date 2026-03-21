@@ -107,3 +107,9 @@ VITE_SUPABASE_ANON_KEY=...
 
 - 현재 이미지는 실제 공방 사진이 아니라 피그마 초안용 임시 이미지가 포함되어 있습니다.
 - 실제 운영용으로 바꾸려면 문구, 연락처, 주소, 이미지 에셋을 실데이터로 교체하는 작업이 필요합니다.
+
+## 저장소 규칙
+
+- Codex 및 작업 규칙: [AGENTS.md](/Users/jiseongpark/Documents/New project/AGENTS.md)
+- 코드 스타일: [docs/engineering/code-style.md](/Users/jiseongpark/Documents/New project/docs/engineering/code-style.md)
+- Git 작업 방식: [docs/engineering/git-workflow.md](/Users/jiseongpark/Documents/New project/docs/engineering/git-workflow.md)

@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+./scripts/check-secrets.sh
+npm run build
