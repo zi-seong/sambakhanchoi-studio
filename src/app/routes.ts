@@ -1,6 +1,8 @@
 import { createBrowserRouter } from "react-router";
 import { AdminGalleryPage } from "./components/admin/AdminGalleryPage";
 import { AdminInquiriesPage } from "./components/admin/AdminInquiriesPage";
+import { AdminTextsPage } from "./components/admin/AdminTextsPage";
+import { AdminImagesPage } from "./components/admin/AdminImagesPage";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { AdminLogin } from "./components/admin/AdminLogin";
 import { AdminProtectedRoute } from "./components/admin/AdminProtectedRoute";
@@ -38,6 +40,8 @@ export const router = createBrowserRouter([
               { index: true, Component: AdminGalleryPage },
               { path: "gallery", Component: AdminGalleryPage },
               { path: "inquiries", Component: AdminInquiriesPage },
+              { path: "texts", Component: AdminTextsPage },
+              { path: "images", Component: AdminImagesPage },
             ],
           },
         ],
