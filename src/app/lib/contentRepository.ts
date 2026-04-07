@@ -10,6 +10,8 @@ import type {
 
 const GALLERY_STORAGE_KEY = "sambakhanchoi.gallery_items";
 const INQUIRY_STORAGE_KEY = "sambakhanchoi.inquiries";
+const SITE_TEXTS_STORAGE_KEY = "sambakhanchoi.site_texts";
+const SITE_IMAGES_STORAGE_KEY = "sambakhanchoi.site_images";
 
 function ensureBrowser() {
   if (typeof window === "undefined") {
@@ -227,6 +229,83 @@ export async function createInquiry(input: InquiryInput) {
   const nextInquiries = [nextInquiry, ...inquiries];
   writeLocalStorage(INQUIRY_STORAGE_KEY, nextInquiries);
   return nextInquiry;
+}
+
+export async function getSiteTexts(): Promise<Record<string, string>> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("site_texts")
+        .select("key, value");
+      if (error) throw error;
+      return Object.fromEntries((data ?? []).map((row) => [row.key, row.value]));
+    } catch {
+      // 테이블이 없을 수 있으므로 localStorage로 fallback
+    }
+  }
+  return readLocalStorage<Record<string, string>>(SITE_TEXTS_STORAGE_KEY, {});
+}
+
+export async function getSiteImages(): Promise<Record<string, string>> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("site_images")
+        .select("key, url");
+      if (error) throw error;
+      return Object.fromEntries((data ?? []).map((row) => [row.key, row.url]));
+    } catch {
+      // 테이블이 없을 수 있으므로 localStorage로 fallback
+    }
+  }
+  return readLocalStorage<Record<string, string>>(SITE_IMAGES_STORAGE_KEY, {});
+}
+
+export async function uploadSiteImage(key: string, file: File): Promise<string> {
+  if (isSupabaseConfigured && supabase) {
+    const { error: uploadError } = await supabase.storage
+      .from("site-images")
+      .upload(key, file, { upsert: true, contentType: file.type });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage.from("site-images").getPublicUrl(key);
+    const url = `${data.publicUrl}?t=${Date.now()}`;
+
+    const { error: dbError } = await supabase
+      .from("site_images")
+      .upsert({ key, url, updated_at: new Date().toISOString() });
+
+    if (dbError) throw dbError;
+    return url;
+  }
+
+  // localStorage fallback: data URL로 저장
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const url = reader.result as string;
+      const images = readLocalStorage<Record<string, string>>(SITE_IMAGES_STORAGE_KEY, {});
+      images[key] = url;
+      writeLocalStorage(SITE_IMAGES_STORAGE_KEY, images);
+      resolve(url);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+export async function updateSiteText(key: string, value: string): Promise<void> {
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase
+      .from("site_texts")
+      .upsert({ key, value, updated_at: new Date().toISOString() });
+    if (error) throw error;
+    return;
+  }
+  const texts = readLocalStorage<Record<string, string>>(SITE_TEXTS_STORAGE_KEY, {});
+  texts[key] = value;
+  writeLocalStorage(SITE_TEXTS_STORAGE_KEY, texts);
 }
 
 export async function updateInquiryStatus(id: string, status: InquiryStatus) {
