@@ -4,8 +4,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { createInquiry } from "../../lib/contentRepository";
 import type { InquiryType } from "../../types/content";
+import { useSiteTexts } from "../SiteTextsProvider";
 
 export function Contact() {
+  const { t } = useSiteTexts();
   const [formData, setFormData] = useState({
     name: "",
     contact: "",
@@ -16,7 +18,6 @@ export function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       setIsSubmitting(true);
       await createInquiry(formData);
@@ -38,14 +39,14 @@ export function Contact() {
   };
 
   return (
-    <div className="pt-24 pb-32 max-w-7xl mx-auto px-6 font-['Noto_Sans_KR',sans-serif]">
+    <div className="pt-16 md:pt-24 pb-16 md:pb-32 max-w-7xl mx-auto px-6 font-['Noto_Sans_KR',sans-serif]">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         className="text-center mb-24"
       >
-        <h1 className="text-4xl md:text-5xl font-['Noto_Serif_KR',serif] text-[#2d2a26] mb-6">문의하기</h1>
+        <h1 className="text-4xl md:text-5xl font-['Noto_Serif_KR',serif] text-[#2d2a26] mb-6">{t("contact.title")}</h1>
         <p className="text-[#5c574f] tracking-widest text-sm uppercase">Contact Us</p>
       </motion.div>
 
@@ -59,23 +60,21 @@ export function Contact() {
           className="flex flex-col gap-12"
         >
           <div>
-            <h2 className="text-2xl font-['Noto_Serif_KR',serif] text-[#2d2a26] mb-4">어떤 점이 궁금하신가요?</h2>
+            <h2 className="text-2xl font-['Noto_Serif_KR',serif] text-[#2d2a26] mb-4">{t("contact.info.title")}</h2>
             <p className="text-[#5c574f] leading-loose mb-8">
-              수업 안내, 도자기 구매, 협업 제안 등 궁금한 점을 남겨주시면 
-              확인 후 이메일이나 문자로 정성껏 답변해 드리겠습니다.
+              {t("contact.info.body")}
             </p>
           </div>
 
           <div className="space-y-8 bg-[#f5f5f0] p-10 rounded-sm">
             <h3 className="text-lg font-['Noto_Serif_KR',serif] text-[#2d2a26] mb-6 border-b border-[#e5e0d8] pb-4">공방 정보</h3>
-            
+
             <div className="flex items-start gap-4">
               <MapPin className="w-5 h-5 text-[#8b7355] mt-1 shrink-0" />
               <div>
-                <p className="font-medium text-[#2d2a26] mb-1">오시는 길</p>
-                <p className="text-sm text-[#5c574f] leading-relaxed">
-                  서울시 종로구 북촌로 123<br />
-                  (안국역 2번 출구에서 도보 10분)
+                <p className="font-medium text-[#2d2a26] mb-1">{t("contact.address.label")}</p>
+                <p className="text-sm text-[#5c574f] leading-relaxed whitespace-pre-line">
+                  {t("contact.address.value")}
                 </p>
               </div>
             </div>
@@ -83,9 +82,9 @@ export function Contact() {
             <div className="flex items-start gap-4">
               <Phone className="w-5 h-5 text-[#8b7355] mt-1 shrink-0" />
               <div>
-                <p className="font-medium text-[#2d2a26] mb-1">전화 문의</p>
-                <p className="text-sm text-[#5c574f]">02-1234-5678</p>
-                <p className="text-xs text-[#a8a196] mt-1">화-토 11:00 - 19:00 (일,월 휴무)</p>
+                <p className="font-medium text-[#2d2a26] mb-1">{t("contact.phone.label")}</p>
+                <p className="text-sm text-[#5c574f]">{t("contact.phone.value")}</p>
+                <p className="text-xs text-[#a8a196] mt-1">{t("contact.phone.hours")}</p>
               </div>
             </div>
 
@@ -109,7 +108,7 @@ export function Contact() {
         >
           <form onSubmit={handleSubmit} className="bg-white border border-[#e5e0d8] p-10 md:p-14 rounded-sm flex flex-col gap-6">
             <h3 className="text-xl font-['Noto_Serif_KR',serif] text-[#2d2a26] mb-4 border-b border-[#e5e0d8] pb-4">온라인 문의</h3>
-            
+
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-[#2d2a26] mb-2">이름</label>
               <input

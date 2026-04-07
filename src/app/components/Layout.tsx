@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, Instagram, MessageCircle, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Toaster } from "sonner";
+import { useSiteTexts } from "./SiteTextsProvider";
 
 const NAV_LINKS = [
   { path: "/about", label: "공방 이야기" },
@@ -12,6 +13,7 @@ const NAV_LINKS = [
 ];
 
 export function Layout() {
+  const { t } = useSiteTexts();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -92,18 +94,17 @@ export function Layout() {
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <h3 className="text-2xl font-['Noto_Serif_KR',serif] tracking-widest mb-6">삼박한최</h3>
-            <p className="text-sm text-[#a8a196] leading-relaxed max-w-sm">
-              흙의 따뜻함과 손길이 닿아 만들어내는<br />
-              자연스러운 형태의 도자기를 선보입니다.
+            <p className="text-sm text-[#a8a196] leading-relaxed max-w-sm whitespace-pre-line">
+              {t("footer.tagline")}
             </p>
           </div>
           <div>
             <h4 className="text-sm font-medium tracking-widest mb-6 text-white">INFORMATION</h4>
             <ul className="text-sm text-[#a8a196] space-y-3">
-              <li>서울시 종로구 북촌로 123 (가상주소)</li>
-              <li>화-토 11:00 - 19:00 (일,월 휴무)</li>
-              <li>02-1234-5678</li>
-              <li>sambakhanchoi@email.com</li>
+              <li>{t("footer.address")}</li>
+              <li>{t("footer.hours")}</li>
+              <li>{t("footer.phone")}</li>
+              <li>{t("footer.email")}</li>
             </ul>
           </div>
           <div>
@@ -120,7 +121,7 @@ export function Layout() {
               </a>
             </div>
             <div className="mt-8 text-xs text-[#5c574f]">
-              <p>대표: 최도예 | 사업자등록번호: 123-45-67890</p>
+              <p>{t("footer.owner")}</p>
               <p className="mt-2">&copy; {new Date().getFullYear()} 삼박한최 공방. All rights reserved.</p>
             </div>
           </div>
