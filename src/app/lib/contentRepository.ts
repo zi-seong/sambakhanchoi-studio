@@ -272,6 +272,30 @@ async function convertIfHeic(file: File): Promise<File> {
   return new File([blob], newName, { type: "image/jpeg" });
 }
 
+export async function uploadGalleryImage(file: File): Promise<string> {
+  const convertedFile = await convertIfHeic(file);
+  const ext = convertedFile.name.split(".").pop() ?? "jpg";
+  const key = `gallery/${crypto.randomUUID()}.${ext}`;
+
+  if (isSupabaseConfigured && supabase) {
+    const { error: uploadError } = await supabase.storage
+      .from("site-images")
+      .upload(key, convertedFile, { upsert: false, contentType: convertedFile.type });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage.from("site-images").getPublicUrl(key);
+    return data.publicUrl;
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(convertedFile);
+  });
+}
+
 export async function uploadSiteImage(key: string, file: File): Promise<string> {
   const convertedFile = await convertIfHeic(file);
   const uploadKey = key.replace(/\.(heic|heif)$/i, ".jpg");

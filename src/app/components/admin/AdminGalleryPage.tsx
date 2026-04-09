@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
-import { Pencil, Plus, Star, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Pencil, Plus, Star, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import {
   createGalleryItem,
   deleteGalleryItem,
   getGalleryItems,
   updateGalleryItem,
+  uploadGalleryImage,
 } from "../../lib/contentRepository";
 import type { GalleryCategory, GalleryItem, GalleryItemInput } from "../../types/content";
 
@@ -24,8 +25,11 @@ export function AdminGalleryPage() {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<GalleryItemInput>(emptyForm);
+  const [preview, setPreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     void loadItems();
@@ -45,6 +49,24 @@ export function AdminGalleryPage() {
   const resetForm = () => {
     setForm(emptyForm);
     setEditingId(null);
+    setPreview("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const url = await uploadGalleryImage(file);
+      setForm((prev) => ({ ...prev, imageUrl: url }));
+      setPreview(url);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -79,6 +101,8 @@ export function AdminGalleryPage() {
       featured: item.featured ?? false,
       displayOrder: item.displayOrder,
     });
+    setPreview(item.imageUrl);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleDelete = async (id: string) => {
@@ -147,16 +171,45 @@ export function AdminGalleryPage() {
               </select>
             </label>
 
-            <label className="flex flex-col gap-2 text-sm">
-              이미지 URL
+            <div className="flex flex-col gap-2 text-sm">
+              이미지
+              <div
+                className="relative flex cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border border-dashed border-[#d8caba] bg-white transition hover:border-[#8b7355]"
+                style={{ minHeight: "160px" }}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {preview ? (
+                  <img src={preview} alt="미리보기" className="h-full w-full object-cover" style={{ maxHeight: "240px" }} />
+                ) : (
+                  <>
+                    <Upload className="h-6 w-6 text-[#8b7355]" />
+                    <span className="text-[#8b7355]">{uploading ? "업로드 중..." : "클릭하여 이미지 선택"}</span>
+                    <span className="text-xs text-[#a09080]">JPG, PNG, WebP, HEIC 지원</span>
+                  </>
+                )}
+                {uploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/70">
+                    <span className="text-sm text-[#8b7355]">업로드 중...</span>
+                  </div>
+                )}
+              </div>
               <input
-                value={form.imageUrl}
-                onChange={(event) => setForm({ ...form, imageUrl: event.target.value })}
-                className="rounded-2xl border border-[#d8caba] bg-white px-4 py-3 outline-none transition focus:border-[#8b7355]"
-                placeholder="https://..."
-                required
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.heic,.heif"
+                className="hidden"
+                onChange={(e) => void handleFileChange(e)}
               />
-            </label>
+              {preview && (
+                <button
+                  type="button"
+                  className="text-xs text-[#8b7355] hover:text-[#2d2a26]"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  이미지 변경
+                </button>
+              )}
+            </div>
 
             <label className="flex flex-col gap-2 text-sm">
               설명
@@ -195,11 +248,11 @@ export function AdminGalleryPage() {
 
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || uploading || !form.imageUrl}
               className="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#2d2a26] px-5 py-4 text-sm tracking-[0.2em] text-white transition hover:bg-[#8b7355] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Plus className="h-4 w-4" />
-              {saving ? "저장 중..." : editingId ? "작품 수정" : "작품 등록"}
+              {uploading ? "이미지 업로드 중..." : saving ? "저장 중..." : editingId ? "작품 수정" : "작품 등록"}
             </button>
           </div>
         </form>
