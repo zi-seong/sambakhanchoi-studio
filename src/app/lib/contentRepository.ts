@@ -1,3 +1,4 @@
+import heic2any from "heic2any";
 import { seedGalleryItems, seedInquiries } from "./contentSeed";
 import { isSupabaseConfigured, supabase } from "./supabase";
 import type {
@@ -261,15 +262,28 @@ export async function getSiteImages(): Promise<Record<string, string>> {
   return readLocalStorage<Record<string, string>>(SITE_IMAGES_STORAGE_KEY, {});
 }
 
+async function convertIfHeic(file: File): Promise<File> {
+  const isHeic = file.type === "image/heic" || file.type === "image/heif" || file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif");
+  if (!isHeic) return file;
+
+  const converted = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+  const blob = Array.isArray(converted) ? converted[0] : converted;
+  const newName = file.name.replace(/\.(heic|heif)$/i, ".jpg");
+  return new File([blob], newName, { type: "image/jpeg" });
+}
+
 export async function uploadSiteImage(key: string, file: File): Promise<string> {
+  const convertedFile = await convertIfHeic(file);
+  const uploadKey = key.replace(/\.(heic|heif)$/i, ".jpg");
+
   if (isSupabaseConfigured && supabase) {
     const { error: uploadError } = await supabase.storage
       .from("site-images")
-      .upload(key, file, { upsert: true, contentType: file.type });
+      .upload(uploadKey, convertedFile, { upsert: true, contentType: convertedFile.type });
 
     if (uploadError) throw uploadError;
 
-    const { data } = supabase.storage.from("site-images").getPublicUrl(key);
+    const { data } = supabase.storage.from("site-images").getPublicUrl(uploadKey);
     const url = `${data.publicUrl}?t=${Date.now()}`;
 
     const { error: dbError } = await supabase
