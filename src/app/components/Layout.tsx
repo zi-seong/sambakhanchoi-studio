@@ -27,8 +27,9 @@ export function Layout() {
       <Toaster position="top-center" richColors />
       <header className="sticky top-0 z-50 bg-[#faf9f6]/90 backdrop-blur-md border-b border-[#e5e0d8]">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Link to="/" className="text-xl font-['Noto_Serif_KR',serif] tracking-widest font-medium">
-            삼박한최 <span className="text-sm font-['Noto_Sans_KR',sans-serif] text-[#5c574f] ml-1 tracking-normal">도예공방</span>
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/logo.png" alt="삼박한최" className="h-10 w-10 object-contain" />
+            <span className="text-sm font-['Noto_Sans_KR',sans-serif] text-[#5c574f] tracking-normal">도예공방</span>
           </Link>
 
           <nav className="hidden md:flex gap-10">
@@ -64,7 +65,7 @@ export function Layout() {
             className="fixed inset-0 z-[100] bg-[#faf9f6] flex flex-col"
           >
             <div className="flex justify-between items-center p-6 border-b border-[#e5e0d8]">
-              <span className="text-xl font-['Noto_Serif_KR',serif] tracking-widest font-medium">삼박한최</span>
+              <img src="/logo.png" alt="삼박한최" className="h-10 w-10 object-contain" />
               <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-[#2d2a26]">
                 <X className="w-6 h-6" strokeWidth={1.5} />
               </button>
