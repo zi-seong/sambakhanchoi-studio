@@ -9,6 +9,7 @@ import { ImageWithFallback } from "../figma/ImageWithFallback";
 export function StudentWorks() {
   const [works, setWorks] = useState<StudentWork[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -58,13 +59,14 @@ export function StudentWorks() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: idx * 0.08 }}
                   className="group relative cursor-pointer mb-8 overflow-hidden rounded-sm"
+                  onClick={() => setActiveId(activeId === work.id ? null : work.id)}
                 >
                   <ImageWithFallback
                     src={work.imageUrl}
                     alt={work.title}
                     className="w-full block group-hover:scale-105 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                  <div className={`absolute inset-0 bg-black/40 transition-opacity duration-300 flex flex-col justify-end p-6 ${activeId === work.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                     <h3 className="text-xl font-['Noto_Serif_KR',serif] text-white mb-1">{work.title}</h3>
                     <p className="text-sm text-white/80 mb-2">{work.studentName}</p>
                     {work.description && (
