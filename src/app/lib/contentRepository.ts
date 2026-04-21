@@ -272,8 +272,35 @@ async function convertIfHeic(file: File): Promise<File> {
   return new File([blob], newName, { type: "image/jpeg" });
 }
 
+async function compressImage(file: File, maxPx = 1200, quality = 0.85): Promise<File> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const { naturalWidth: w, naturalHeight: h } = img;
+      const scale = Math.min(1, maxPx / Math.max(w, h));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(w * scale);
+      canvas.height = Math.round(h * scale);
+      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { resolve(file); return; }
+          const name = file.name.replace(/\.[^.]+$/, ".jpg");
+          resolve(new File([blob], name, { type: "image/jpeg" }));
+        },
+        "image/jpeg",
+        quality,
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
 export async function uploadGalleryImage(file: File): Promise<string> {
-  const convertedFile = await convertIfHeic(file);
+  const convertedFile = await compressImage(await convertIfHeic(file));
   const ext = convertedFile.name.split(".").pop() ?? "jpg";
   const key = `gallery/${crypto.randomUUID()}.${ext}`;
 
@@ -297,7 +324,7 @@ export async function uploadGalleryImage(file: File): Promise<string> {
 }
 
 export async function uploadSiteImage(key: string, file: File): Promise<string> {
-  const convertedFile = await convertIfHeic(file);
+  const convertedFile = await compressImage(await convertIfHeic(file));
   const uploadKey = key.replace(/\.(heic|heif)$/i, ".jpg");
 
   if (isSupabaseConfigured && supabase) {
