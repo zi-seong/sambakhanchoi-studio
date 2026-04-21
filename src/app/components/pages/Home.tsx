@@ -29,14 +29,6 @@ export function Home() {
     <div className="flex flex-col w-full">
       {/* Hero Section */}
       <section className="relative h-[85vh] w-full bg-[#1c1a18] overflow-hidden">
-        {/* 모바일: 이미지 fallback */}
-        <div className="md:hidden absolute inset-0 w-full h-full">
-          <ImageWithFallback
-            src={img("hero")}
-            alt="공방 대표 이미지"
-            className="w-full h-full object-cover"
-          />
-        </div>
         {/* 데스크탑: 유튜브 영상 */}
         <div className="hidden md:block absolute inset-0">
           <iframe
