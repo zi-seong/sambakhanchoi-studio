@@ -1,13 +1,23 @@
 import { motion } from "motion/react";
 import { Link } from "react-router";
 import { ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { useSiteTexts } from "../SiteTextsProvider";
 import { useSiteImages } from "../SiteImagesProvider";
+import { getNotices } from "../../lib/contentRepository";
+import type { Notice } from "../../types/content";
 
 export function Home() {
   const { t } = useSiteTexts();
   const { img } = useSiteImages();
+  const [notices, setNotices] = useState<Notice[]>([]);
+
+  useEffect(() => {
+    getNotices()
+      .then((data) => setNotices(data.filter((n) => n.isActive)))
+      .catch(() => {});
+  }, []);
 
   const works = [
     { img: img("celadon"), title: t("home.works.item1.title"), desc: t("home.works.item1.desc") },
@@ -88,6 +98,38 @@ export function Home() {
           </Link>
         </motion.div>
       </section>
+
+      {/* Notices */}
+      {notices.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-4xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-['Noto_Serif_KR',serif] text-[#2d2a26]">공지사항</h2>
+                <span className="text-xs text-[#8b7355] tracking-widest uppercase">Notice</span>
+              </div>
+              <ul className="divide-y divide-[#e5e0d8]">
+                {notices.map((notice) => (
+                  <li key={notice.id} className="py-5 flex gap-8 md:gap-16">
+                    <span className="shrink-0 w-24 text-xs text-[#8b7355] tracking-wide pt-1">
+                      {new Date(notice.createdAt).toLocaleDateString("ko-KR")}
+                    </span>
+                    <div>
+                      <p className="text-sm font-medium text-[#2d2a26] mb-1">{notice.title}</p>
+                      <p className="text-sm text-[#5c574f] leading-relaxed whitespace-pre-line">{notice.content}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* Featured Works */}
       <section className="py-24 bg-white">

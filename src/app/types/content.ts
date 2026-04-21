@@ -44,3 +44,35 @@ export interface GalleryItemInput {
   featured: boolean;
   displayOrder: number;
 }
+
+export interface Notice {
+  id: string;
+  title: string;
+  content: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface NoticeInput {
+  title: string;
+  content: string;
+  isActive: boolean;
+}
+
+export interface StudentWork {
+  id: string;
+  title: string;
+  studentName: string;
+  description: string;
+  imageUrl: string;
+  displayOrder: number;
+  createdAt: string;
+}
+
+export interface StudentWorkInput {
+  title: string;
+  studentName: string;
+  description: string;
+  imageUrl: string;
+  displayOrder: number;
+}

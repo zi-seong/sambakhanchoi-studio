@@ -1,10 +1,12 @@
 import { Link, NavLink, Outlet } from "react-router";
-import { LogOut, Package, MessageSquareMore, Settings2, Type, Image } from "lucide-react";
+import { LogOut, Package, MessageSquareMore, Settings2, Type, Image, BellRing, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { useAdminAuth } from "./AdminAuthProvider";
 
 const navItems = [
   { to: "/admin/gallery", label: "갤러리 관리", icon: Package },
+  { to: "/admin/student-works", label: "수강생 작품 관리", icon: GraduationCap },
+  { to: "/admin/notices", label: "공지 관리", icon: BellRing },
   { to: "/admin/inquiries", label: "문의 관리", icon: MessageSquareMore },
   { to: "/admin/texts", label: "텍스트 관리", icon: Type },
   { to: "/admin/images", label: "이미지 관리", icon: Image },

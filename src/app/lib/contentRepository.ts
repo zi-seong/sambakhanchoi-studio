@@ -7,9 +7,14 @@ import type {
   Inquiry,
   InquiryInput,
   InquiryStatus,
+  Notice,
+  NoticeInput,
+  StudentWork,
+  StudentWorkInput,
 } from "../types/content";
 
 const GALLERY_STORAGE_KEY = "sambakhanchoi.gallery_items";
+const STUDENT_WORKS_STORAGE_KEY = "sambakhanchoi.student_works";
 const INQUIRY_STORAGE_KEY = "sambakhanchoi.inquiries";
 const SITE_TEXTS_STORAGE_KEY = "sambakhanchoi.site_texts";
 const SITE_IMAGES_STORAGE_KEY = "sambakhanchoi.site_images";
@@ -360,6 +365,68 @@ export async function uploadSiteImage(key: string, file: File): Promise<string> 
   });
 }
 
+function normalizeNoticeRow(row: {
+  id: string;
+  title: string;
+  content: string;
+  is_active: boolean | null;
+  created_at: string | null;
+}): Notice {
+  return {
+    id: row.id,
+    title: row.title,
+    content: row.content,
+    isActive: row.is_active ?? true,
+    createdAt: row.created_at ?? new Date().toISOString(),
+  };
+}
+
+export async function getNotices(): Promise<Notice[]> {
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from("notices")
+      .select("id, title, content, is_active, created_at")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map(normalizeNoticeRow);
+  }
+  return [];
+}
+
+export async function createNotice(input: NoticeInput): Promise<Notice> {
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from("notices")
+      .insert({ title: input.title, content: input.content, is_active: input.isActive })
+      .select("id, title, content, is_active, created_at")
+      .single();
+    if (error) throw error;
+    return normalizeNoticeRow(data);
+  }
+  throw new Error("Supabase가 연결되지 않았습니다.");
+}
+
+export async function updateNotice(id: string, input: NoticeInput): Promise<void> {
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase
+      .from("notices")
+      .update({ title: input.title, content: input.content, is_active: input.isActive })
+      .eq("id", id);
+    if (error) throw error;
+    return;
+  }
+  throw new Error("Supabase가 연결되지 않았습니다.");
+}
+
+export async function deleteNotice(id: string): Promise<void> {
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase.from("notices").delete().eq("id", id);
+    if (error) throw error;
+    return;
+  }
+  throw new Error("Supabase가 연결되지 않았습니다.");
+}
+
 export async function updateSiteText(key: string, value: string): Promise<void> {
   if (isSupabaseConfigured && supabase) {
     const { error } = await supabase
@@ -371,6 +438,97 @@ export async function updateSiteText(key: string, value: string): Promise<void> 
   const texts = readLocalStorage<Record<string, string>>(SITE_TEXTS_STORAGE_KEY, {});
   texts[key] = value;
   writeLocalStorage(SITE_TEXTS_STORAGE_KEY, texts);
+}
+
+function normalizeStudentWorkRow(row: {
+  id: string;
+  title: string;
+  student_name: string;
+  description: string;
+  image_url: string;
+  display_order: number | null;
+  created_at: string | null;
+}): StudentWork {
+  return {
+    id: row.id,
+    title: row.title,
+    studentName: row.student_name,
+    description: row.description,
+    imageUrl: row.image_url,
+    displayOrder: row.display_order ?? 0,
+    createdAt: row.created_at ?? new Date().toISOString(),
+  };
+}
+
+export async function getStudentWorks(): Promise<StudentWork[]> {
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from("student_works")
+      .select("id, title, student_name, description, image_url, display_order, created_at")
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []).map(normalizeStudentWorkRow);
+  }
+  const items = readLocalStorage<StudentWork[]>(STUDENT_WORKS_STORAGE_KEY, []);
+  return [...items].sort((a, b) => a.displayOrder - b.displayOrder);
+}
+
+export async function createStudentWork(input: StudentWorkInput): Promise<StudentWork> {
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from("student_works")
+      .insert({
+        title: input.title,
+        student_name: input.studentName,
+        description: input.description,
+        image_url: input.imageUrl,
+        display_order: input.displayOrder,
+      })
+      .select("id, title, student_name, description, image_url, display_order, created_at")
+      .single();
+    if (error) throw error;
+    return normalizeStudentWorkRow(data);
+  }
+  const items = readLocalStorage<StudentWork[]>(STUDENT_WORKS_STORAGE_KEY, []);
+  const next: StudentWork = { id: crypto.randomUUID(), createdAt: new Date().toISOString(), ...input };
+  writeLocalStorage(STUDENT_WORKS_STORAGE_KEY, [...items, next]);
+  return next;
+}
+
+export async function updateStudentWork(id: string, input: StudentWorkInput): Promise<StudentWork> {
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from("student_works")
+      .update({
+        title: input.title,
+        student_name: input.studentName,
+        description: input.description,
+        image_url: input.imageUrl,
+        display_order: input.displayOrder,
+      })
+      .eq("id", id)
+      .select("id, title, student_name, description, image_url, display_order, created_at")
+      .single();
+    if (error) throw error;
+    return normalizeStudentWorkRow(data);
+  }
+  const items = readLocalStorage<StudentWork[]>(STUDENT_WORKS_STORAGE_KEY, []);
+  const updated = items.find((i) => i.id === id);
+  if (!updated) throw new Error("항목을 찾을 수 없습니다.");
+  const next = { ...updated, ...input };
+  writeLocalStorage(STUDENT_WORKS_STORAGE_KEY, items.map((i) => (i.id === id ? next : i)));
+  return next;
+}
+
+export async function deleteStudentWork(id: string): Promise<void> {
+  if (isSupabaseConfigured && supabase) {
+    const { error } = await supabase.from("student_works").delete().eq("id", id);
+    if (error) throw error;
+    return;
+  }
+  const items = readLocalStorage<StudentWork[]>(STUDENT_WORKS_STORAGE_KEY, []);
+  writeLocalStorage(STUDENT_WORKS_STORAGE_KEY, items.filter((i) => i.id !== id));
 }
 
 export async function updateInquiryStatus(id: string, status: InquiryStatus) {

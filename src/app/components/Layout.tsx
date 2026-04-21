@@ -8,6 +8,7 @@ import { useSiteTexts } from "./SiteTextsProvider";
 const NAV_LINKS = [
   { path: "/about", label: "공방 이야기" },
   { path: "/gallery", label: "작품 갤러리" },
+  { path: "/student-works", label: "수강생 작품" },
   { path: "/classes", label: "수업 안내" },
   { path: "/contact", label: "문의하기" },
 ];
