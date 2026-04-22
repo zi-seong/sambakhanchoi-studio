@@ -5,30 +5,44 @@ import { useEffect, useState } from "react";
 import { ImageWithFallback } from "../figma/ImageWithFallback";
 import { useSiteTexts } from "../SiteTextsProvider";
 import { useSiteImages } from "../SiteImagesProvider";
-import { getNotices } from "../../lib/contentRepository";
-import type { Notice } from "../../types/content";
+import { getGalleryItems, getNotices } from "../../lib/contentRepository";
+import type { GalleryItem, Notice } from "../../types/content";
 
 export function Home() {
   const { t } = useSiteTexts();
   const { img } = useSiteImages();
   const [notices, setNotices] = useState<Notice[]>([]);
+  const [featuredWorks, setFeaturedWorks] = useState<GalleryItem[]>([]);
 
   useEffect(() => {
     getNotices()
       .then((data) => setNotices(data.filter((n) => n.isActive)))
       .catch(() => {});
+    getGalleryItems()
+      .then((data) => setFeaturedWorks(data.filter((item) => item.featured)))
+      .catch(() => {});
   }, []);
 
-  const works = [
+  const fallbackWorks = [
     { img: img("celadon"), title: t("home.works.item1.title"), desc: t("home.works.item1.desc") },
     { img: img("whitePorcelain"), title: t("home.works.item2.title"), desc: t("home.works.item2.desc") },
     { img: img("handmadeCups"), title: t("home.works.item3.title"), desc: t("home.works.item3.desc") },
   ];
 
+  const works = featuredWorks.length > 0
+    ? featuredWorks.map((item) => ({ img: item.imageUrl, title: item.title, desc: item.description }))
+    : fallbackWorks;
+
   return (
     <div className="flex flex-col w-full">
       {/* Hero Section */}
       <section className="relative h-[85vh] w-full bg-[#1c1a18] overflow-hidden">
+        {/* 모바일: 연한 배경 이미지 */}
+        {img("hero") && (
+          <div className="md:hidden absolute inset-0">
+            <img src={img("hero")} alt="" className="w-full h-full object-cover opacity-20" />
+          </div>
+        )}
         {/* 데스크탑: 유튜브 영상 */}
         <div className="hidden md:block absolute inset-0">
           <iframe
