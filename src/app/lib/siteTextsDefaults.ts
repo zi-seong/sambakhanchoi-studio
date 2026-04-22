@@ -34,6 +34,7 @@ export const DEFAULT_SITE_TEXTS: Record<string, SiteTextMeta> = {
   "about.artist.career1": { value: "2020 한국도자재단 신진작가 공모전 입상", label: "경력1", page: "공방이야기" },
   "about.artist.career2": { value: "2021 개인전 '흙의 시간' (갤러리 아토)", label: "경력2", page: "공방이야기" },
   "about.artist.career3": { value: "2023 삼박한최 도예공방 오픈", label: "경력3", page: "공방이야기" },
+  "about.artist.careers": { value: JSON.stringify(["2020 한국도자재단 신진작가 공모전 입상", "2021 개인전 '흙의 시간' (갤러리 아토)", "2023 삼박한최 도예공방 오픈"]), label: "경력 목록", page: "공방이야기" },
 
   // 수업안내
   "classes.title": { value: "수업 안내", label: "페이지 제목", page: "수업안내" },

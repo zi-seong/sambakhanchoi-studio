@@ -13,7 +13,12 @@ export const DEFAULT_SITE_IMAGES: Record<string, SiteImageMeta> = {
   wheelHands: {
     defaultUrl: "https://images.unsplash.com/photo-1720176472643-731fc581b10e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwb3R0ZXJ5JTIwd2hlZWwlMjBoYW5kcyUyMG1ha2luZ3xlbnwxfHx8fDE3NzQwMzk1ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
     label: "물레 작업",
-    usage: "홈 클래스 소개 · 수업안내 · 소개 작가 사진",
+    usage: "홈 클래스 소개 · 수업안내",
+  },
+  artistProfile: {
+    defaultUrl: "https://images.unsplash.com/photo-1720176472643-731fc581b10e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwb3R0ZXJ5JTIwd2hlZWwlMjBoYW5kcyUyMG1ha2luZ3xlbnwxfHx8fDE3NzQwMzk1ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    label: "도예가 프로필 사진",
+    usage: "공방이야기 · 도예가 소개 섹션",
   },
   warmInterior: {
     defaultUrl: "",

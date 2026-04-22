@@ -85,7 +85,7 @@ export function About() {
             transition={{ duration: 0.8 }}
             className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0 rounded-full overflow-hidden border-4 border-[#faf9f6]"
           >
-            <ImageWithFallback src={img("wheelHands")} alt="작가 사진" className="w-full h-full object-cover grayscale" />
+            <ImageWithFallback src={img("artistProfile")} alt="작가 사진" className="w-full h-full object-cover grayscale" />
           </motion.div>
 
           <motion.div
@@ -100,9 +100,15 @@ export function About() {
               {t("about.artist.quote")}
             </p>
             <ul className="text-[#a8a196] text-sm space-y-2 font-light">
-              <li>{t("about.artist.career1")}</li>
-              <li>{t("about.artist.career2")}</li>
-              <li>{t("about.artist.career3")}</li>
+              {(() => {
+                try {
+                  const raw = t("about.artist.careers");
+                  if (raw) return (JSON.parse(raw) as string[]).map((c, i) => <li key={i}>{c}</li>);
+                } catch {}
+                return [t("about.artist.career1"), t("about.artist.career2"), t("about.artist.career3")]
+                  .filter(Boolean)
+                  .map((c, i) => <li key={i}>{c}</li>);
+              })()}
             </ul>
           </motion.div>
         </div>
