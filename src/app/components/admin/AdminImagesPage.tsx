@@ -68,7 +68,7 @@ export function AdminImagesPage() {
               <div className="shrink-0">
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif"
                   className="hidden"
                   ref={(el) => { fileInputRefs.current[key] = el; }}
                   onChange={(e) => void handleFileChange(key, e)}

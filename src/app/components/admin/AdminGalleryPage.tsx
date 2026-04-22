@@ -196,7 +196,7 @@ export function AdminGalleryPage() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*,.heic,.heif"
+                accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif"
                 className="hidden"
                 onChange={(e) => void handleFileChange(e)}
               />
